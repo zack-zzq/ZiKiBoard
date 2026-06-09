@@ -37,12 +37,20 @@ export function resolveProvider(env: Env, providerId: string): RuntimeProvider {
   }
   const clientId = resolveClientId(env, provider);
   if (!clientId) {
-    throw httpError(400, "provider_not_configured", "Provider clientId is not configured");
+    throw httpError(
+      400,
+      "provider_not_configured",
+      `Provider clientId is not configured${expectedEnvMessage(provider.clientIdEnv ?? provider.clientId)}`,
+    );
   }
 
   const clientSecret = resolveClientSecret(env, provider);
   if (!clientSecret) {
-    throw httpError(400, "provider_not_configured", "Provider client secret is not configured");
+    throw httpError(
+      400,
+      "provider_not_configured",
+      `Provider client secret is not configured${expectedEnvMessage(provider.clientSecretEnv ?? provider.clientSecret)}`,
+    );
   }
 
   return { config: provider, clientId, clientSecret };
@@ -100,11 +108,25 @@ function readOptionalString(value: Record<string, unknown>, key: string): string
 }
 
 function resolveClientId(env: Env, provider: ProviderConfig): string | undefined {
-  return provider.clientId ?? readDynamicEnv(env, provider.clientIdEnv);
+  return resolveConfiguredValue(env, provider.clientId, provider.clientIdEnv);
 }
 
 function resolveClientSecret(env: Env, provider: ProviderConfig): string | undefined {
-  return provider.clientSecret ?? readDynamicEnv(env, provider.clientSecretEnv);
+  return resolveConfiguredValue(env, provider.clientSecret, provider.clientSecretEnv);
+}
+
+function resolveConfiguredValue(env: Env, literalValue: string | undefined, envName: string | undefined): string | undefined {
+  const envValue = readDynamicEnv(env, envName);
+  if (envValue) {
+    return envValue;
+  }
+
+  if (!literalValue) {
+    return undefined;
+  }
+
+  const valueAsEnvReference = readDynamicEnv(env, literalValue);
+  return valueAsEnvReference ?? literalValue;
 }
 
 function readDynamicEnv(env: Env, name: string | undefined): string | undefined {
@@ -112,5 +134,10 @@ function readDynamicEnv(env: Env, name: string | undefined): string | undefined 
     return undefined;
   }
   const dynamicEnv = env as unknown as Record<string, string | undefined>;
-  return dynamicEnv[name];
+  const value = dynamicEnv[name];
+  return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+function expectedEnvMessage(name: string | undefined): string {
+  return name && /^[A-Z][A-Z0-9_]*$/.test(name) ? `; expected env binding ${name}` : "";
 }
