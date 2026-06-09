@@ -15,6 +15,8 @@
       providers: [],
       user: null,
       comments: [],
+      draft: "",
+      composerMode: "write",
       replyTo: null,
       mentionQuery: null,
       mentionUsers: [],
@@ -23,6 +25,7 @@
       busy: false,
     };
 
+    root.__zikiboardState = state;
     root.classList.add("zb");
     refresh();
 
@@ -61,10 +64,14 @@
 
     function header() {
       const node = el("div", "zb-header");
-      node.append(el("h2", "zb-title", "Comments"));
+      const titleWrap = el("div", "zb-title-wrap");
+      titleWrap.append(el("h2", "zb-title", "Comments"));
+      titleWrap.append(el("span", "zb-count", `${countComments(state.comments)} ${countComments(state.comments) === 1 ? "comment" : "comments"}`));
+      node.append(titleWrap);
       const bar = el("div", "zb-userbar");
       if (state.user) {
-        bar.append(el("span", "zb-author", state.user.displayName));
+        const userPill = el("span", "zb-current-user", state.user.displayName);
+        bar.append(userPill);
         const logout = button("Log out", "zb-button", async () => {
           await api("/api/auth/logout", { method: "POST" });
           await refresh();
@@ -95,13 +102,40 @@
     function composer() {
       const wrap = el("div", "zb-composer");
       if (!state.user) {
-        wrap.append(el("p", "zb-login-copy", "Sign in to comment."));
+        wrap.append(el("p", "zb-login-copy", "Sign in to join the discussion."));
         return wrap;
       }
 
+      if (state.replyTo) {
+        const replyBar = el("div", "zb-replying");
+        replyBar.append(el("span", "", `Replying to @${state.replyTo.author ? state.replyTo.author.handle : "comment"}`));
+        replyBar.append(
+          button("Cancel", "zb-link-button", () => {
+            state.replyTo = null;
+            render();
+          }),
+        );
+        wrap.append(replyBar);
+      }
+
+      const file = document.createElement("input");
+      file.type = "file";
+      file.accept = "image/jpeg,image/png,image/gif,image/webp";
+      file.className = "zb-file";
+
+      let meta;
+      let preview;
       const textarea = document.createElement("textarea");
-      textarea.placeholder = state.replyTo ? `Reply to @${state.replyTo.author.handle}` : "Write a comment";
+      textarea.value = state.draft;
+      textarea.placeholder = state.replyTo && state.replyTo.author ? `Reply to @${state.replyTo.author.handle}` : "Write a comment";
       textarea.addEventListener("input", () => {
+        state.draft = textarea.value;
+        if (meta) {
+          meta.textContent = `${state.draft.length}/5000`;
+        }
+        if (preview && state.composerMode === "preview") {
+          renderPreviewContent(preview, state.draft);
+        }
         const query = activeMentionQuery(textarea.value, textarea.selectionStart);
         state.mentionQuery = query;
         if (query) {
@@ -110,47 +144,56 @@
           removeFloating();
         }
       });
-      wrap.append(textarea);
-
-      const toolbar = el("div", "zb-toolbar");
-      const left = el("div", "zb-actions");
-      const file = document.createElement("input");
-      file.type = "file";
-      file.accept = "image/jpeg,image/png,image/gif,image/webp";
-      file.className = "zb-file";
       file.addEventListener("change", async () => {
         if (file.files && file.files[0]) {
           try {
             const uploaded = await upload(file.files[0]);
-            textarea.value += `\n![${escapeMarkdownAlt(file.files[0].name)}](${uploaded.url})\n`;
+            appendToDraft(textarea, `\n![${escapeMarkdownAlt(file.files[0].name)}](${uploaded.url})\n`);
           } catch (error) {
             state.error = messageFrom(error);
             render();
           }
         }
       });
-      left.append(file);
-      left.append(button("&#128247;", "zb-icon-button", () => file.click(), "Image"));
-      left.append(
+
+      const formatbar = el("div", "zb-formatbar");
+      formatbar.append(file);
+      formatbar.append(formatButton("B", "Bold", () => wrapSelection(textarea, "**", "**", "bold text")));
+      formatbar.append(formatButton("<i>I</i>", "Italic", () => wrapSelection(textarea, "*", "*", "italic text")));
+      formatbar.append(formatButton("&#128279;", "Link", () => insertLink(textarea)));
+      formatbar.append(formatButton("&lt;/&gt;", "Code", () => wrapSelection(textarea, "`", "`", "code")));
+      formatbar.append(formatButton("&#8220;", "Quote", () => prefixSelectionLines(textarea, "> ")));
+      formatbar.append(formatButton("&#8226;", "List", () => prefixSelectionLines(textarea, "- ")));
+      formatbar.append(formatButton("&#128247;", "Image", () => file.click()));
+      formatbar.append(
         button("&#128522;", "zb-icon-button", () => {
           state.emojiOpen = !state.emojiOpen;
           renderEmojiPanel(wrap, textarea);
         }, "Emoji"),
       );
-      toolbar.append(left);
+      wrap.append(formatbar);
+
+      const editorHead = el("div", "zb-editor-head");
+      const segments = el("div", "zb-segments");
+      const writeButton = button("Write", "zb-segment", () => setComposerMode("write", editorShell, textarea, preview, writeButton, previewButton));
+      const previewButton = button("Preview", "zb-segment", () => setComposerMode("preview", editorShell, textarea, preview, writeButton, previewButton));
+      segments.append(writeButton, previewButton);
+      editorHead.append(segments);
+      wrap.append(editorHead);
+
+      const editorShell = el("div", "zb-editor-shell");
+      editorShell.append(textarea);
+      preview = el("div", "zb-preview zb-markdown");
+      editorShell.append(preview);
+      wrap.append(editorShell);
+      setComposerMode(state.composerMode, editorShell, textarea, preview, writeButton, previewButton);
+
+      const toolbar = el("div", "zb-toolbar");
 
       const right = el("div", "zb-actions");
-      if (state.replyTo) {
-        right.append(
-          button("Cancel", "zb-button", () => {
-            state.replyTo = null;
-            render();
-          }),
-        );
-      }
       right.append(
         button("Post", "zb-button zb-button-primary", async () => {
-          const content = textarea.value.trim();
+          const content = state.draft.trim();
           if (!content || state.busy) {
             return;
           }
@@ -166,6 +209,8 @@
               }),
             });
             state.replyTo = null;
+            state.draft = "";
+            state.composerMode = "write";
             await refresh();
           } catch (error) {
             state.error = messageFrom(error);
@@ -175,6 +220,8 @@
           }
         }),
       );
+      meta = el("div", "zb-editor-meta", `${state.draft.length}/5000`);
+      toolbar.append(meta);
       toolbar.append(right);
       wrap.append(toolbar);
       return wrap;
@@ -338,6 +385,74 @@
     return node;
   }
 
+  function formatButton(label, title, onClick) {
+    return button(label, "zb-icon-button zb-format-button", onClick, title);
+  }
+
+  function setComposerMode(mode, shell, textarea, preview, writeButton, previewButton) {
+    stateSafeSetMode(shell, mode);
+    if (mode === "preview") {
+      renderPreviewContent(preview, stateValue(textarea));
+    }
+    textarea.hidden = mode !== "write";
+    preview.hidden = mode !== "preview";
+    writeButton.classList.toggle("zb-segment-active", mode === "write");
+    previewButton.classList.toggle("zb-segment-active", mode === "preview");
+  }
+
+  function stateSafeSetMode(shell, mode) {
+    shell.dataset.mode = mode;
+    const widget = shell.closest(".zb");
+    if (widget && widget.__zikiboardState) {
+      widget.__zikiboardState.composerMode = mode;
+    }
+  }
+
+  function stateValue(textarea) {
+    return textarea.value;
+  }
+
+  function renderPreviewContent(preview, markdown) {
+    preview.innerHTML = markdown.trim()
+      ? renderMarkdown(markdown)
+      : '<p class="zb-preview-empty">Nothing to preview.</p>';
+  }
+
+  function wrapSelection(textarea, before, after, placeholder) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end) || placeholder;
+    replaceRange(textarea, start, end, `${before}${selected}${after}`);
+  }
+
+  function insertLink(textarea) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end) || "link text";
+    replaceRange(textarea, start, end, `[${selected}](https://)`);
+  }
+
+  function prefixSelectionLines(textarea, prefix) {
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selected = textarea.value.slice(start, end) || "";
+    const replacement = selected
+      ? selected.split("\n").map((line) => `${prefix}${line}`).join("\n")
+      : `${prefix}`;
+    replaceRange(textarea, start, end, replacement);
+  }
+
+  function replaceRange(textarea, start, end, value) {
+    textarea.focus();
+    textarea.setRangeText(value, start, end, "end");
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
+  function appendToDraft(textarea, value) {
+    textarea.value += value;
+    textarea.dispatchEvent(new Event("input", { bubbles: true }));
+  }
+
   function renderMarkdown(markdown) {
     let html = escapeHtml(markdown);
     html = html.replace(/!\[([^\]]*)\]\((https?:\/\/[^)\s]+|\/media\/[^)\s]+)\)/g, function (_, alt, url) {
@@ -415,5 +530,9 @@
 
   function messageFrom(error) {
     return error && error.message ? error.message : "Request failed";
+  }
+
+  function countComments(comments) {
+    return comments.reduce((total, comment) => total + 1 + countComments(comment.replies || []), 0);
   }
 })();
