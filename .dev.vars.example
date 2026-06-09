@@ -1,0 +1,16 @@
+APP_ORIGIN=http://localhost:8787
+CORS_ORIGINS=http://localhost:8787
+SESSION_COOKIE_NAME=zikiboard_session
+SESSION_TTL_SECONDS=2592000
+COOKIE_SAME_SITE=Lax
+MAX_IMAGE_BYTES=5242880
+ALLOWED_IMAGE_TYPES=image/jpeg,image/png,image/gif,image/webp
+
+# Configure public provider metadata here. Keep client secrets in separate vars.
+# AUTH_PROVIDERS=[{"id":"github","name":"GitHub","type":"github","clientId":"your-client-id","clientSecretEnv":"GITHUB_CLIENT_SECRET"},{"id":"google","name":"Google","type":"oidc","issuer":"https://accounts.google.com","clientId":"your-client-id","clientSecretEnv":"GOOGLE_CLIENT_SECRET"},{"id":"microsoft","name":"Microsoft","type":"oidc","issuer":"https://login.microsoftonline.com/common/v2.0","clientId":"your-client-id","clientSecretEnv":"MICROSOFT_CLIENT_SECRET"},{"id":"dingtalk","name":"DingTalk","type":"oidc","issuer":"https://your-dingtalk-issuer","clientId":"your-client-id","clientSecretEnv":"DINGTALK_CLIENT_SECRET"}]
+AUTH_PROVIDERS=[]
+
+# GITHUB_CLIENT_SECRET=
+# GOOGLE_CLIENT_SECRET=
+# MICROSOFT_CLIENT_SECRET=
+# DINGTALK_CLIENT_SECRET=

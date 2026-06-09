@@ -1,0 +1,110 @@
+import { httpError, isRecord } from "./http";
+import type { ProviderConfig, PublicProvider, RuntimeProvider } from "./types";
+
+export function appOrigin(env: Env, request: Request): string {
+  const configured = env.APP_ORIGIN.trim();
+  if (configured) {
+    return configured.replace(/\/$/, "");
+  }
+  const url = new URL(request.url);
+  return url.origin;
+}
+
+export function sessionTtlSeconds(env: Env): number {
+  const parsed = Number.parseInt(env.SESSION_TTL_SECONDS, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 24 * 30;
+}
+
+export function maxImageBytes(env: Env): number {
+  const parsed = Number.parseInt(env.MAX_IMAGE_BYTES, 10);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 5 * 1024 * 1024;
+}
+
+export function publicProviders(env: Env): PublicProvider[] {
+  return readProviders(env).map((provider) => ({
+    id: provider.id,
+    name: provider.name,
+    type: provider.type,
+    configured: provider.clientId.length > 0,
+  }));
+}
+
+export function resolveProvider(env: Env, providerId: string): RuntimeProvider {
+  const provider = readProviders(env).find((candidate) => candidate.id === providerId);
+  if (!provider) {
+    throw httpError(404, "provider_not_found", "Unknown auth provider");
+  }
+  if (!provider.clientId) {
+    throw httpError(400, "provider_not_configured", "Provider clientId is not configured");
+  }
+
+  const clientSecret = provider.clientSecret ?? readDynamicSecret(env, provider.clientSecretEnv);
+  if (!clientSecret) {
+    throw httpError(400, "provider_not_configured", "Provider client secret is not configured");
+  }
+
+  return { config: provider, clientSecret };
+}
+
+function readProviders(env: Env): ProviderConfig[] {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(env.AUTH_PROVIDERS || "[]");
+  } catch {
+    throw httpError(500, "invalid_auth_config", "AUTH_PROVIDERS must be valid JSON");
+  }
+  if (!Array.isArray(raw)) {
+    throw httpError(500, "invalid_auth_config", "AUTH_PROVIDERS must be an array");
+  }
+  return raw.map(parseProvider);
+}
+
+function parseProvider(value: unknown): ProviderConfig {
+  if (!isRecord(value)) {
+    throw httpError(500, "invalid_auth_config", "Provider config must be an object");
+  }
+
+  const id = readRequiredString(value, "id");
+  const name = readRequiredString(value, "name");
+  const typeValue = value.type === undefined ? "oidc" : readRequiredString(value, "type");
+  const type = typeValue === "github" ? "github" : "oidc";
+  const scopes = Array.isArray(value.scopes)
+    ? value.scopes.filter((scope): scope is string => typeof scope === "string")
+    : undefined;
+
+  return {
+    id,
+    name,
+    type,
+    clientId: readRequiredString(value, "clientId"),
+    clientSecret: readOptionalString(value, "clientSecret"),
+    clientSecretEnv: readOptionalString(value, "clientSecretEnv"),
+    issuer: readOptionalString(value, "issuer"),
+    authorizationEndpoint: readOptionalString(value, "authorizationEndpoint"),
+    tokenEndpoint: readOptionalString(value, "tokenEndpoint"),
+    userinfoEndpoint: readOptionalString(value, "userinfoEndpoint"),
+    jwksUri: readOptionalString(value, "jwksUri"),
+    scopes,
+  };
+}
+
+function readRequiredString(value: Record<string, unknown>, key: string): string {
+  const field = value[key];
+  if (typeof field !== "string") {
+    throw httpError(500, "invalid_auth_config", `${key} must be a string`);
+  }
+  return field.trim();
+}
+
+function readOptionalString(value: Record<string, unknown>, key: string): string | undefined {
+  const field = value[key];
+  return typeof field === "string" && field.trim() ? field.trim() : undefined;
+}
+
+function readDynamicSecret(env: Env, name: string | undefined): string | undefined {
+  if (!name) {
+    return undefined;
+  }
+  const dynamicEnv = env as unknown as Record<string, string | undefined>;
+  return dynamicEnv[name];
+}

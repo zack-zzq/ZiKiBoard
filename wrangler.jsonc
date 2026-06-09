@@ -1,0 +1,47 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "zikiboard",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-06-09",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  "assets": {
+    "directory": "./public",
+    "binding": "ASSETS",
+    "run_worker_first": ["/api/*", "/media/*"],
+    "not_found_handling": "single-page-application"
+  },
+  "vars": {
+    "APP_ORIGIN": "http://localhost:8787",
+    "SESSION_COOKIE_NAME": "zikiboard_session",
+    "SESSION_TTL_SECONDS": "2592000",
+    "COOKIE_SAME_SITE": "Lax",
+    "CORS_ORIGINS": "http://localhost:8787",
+    "AUTH_PROVIDERS": "[]",
+    "MAX_IMAGE_BYTES": "5242880",
+    "ALLOWED_IMAGE_TYPES": "image/jpeg,image/png,image/gif,image/webp"
+  },
+  "kv_namespaces": [
+    {
+      "binding": "AUTH_CACHE",
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "IMAGES",
+      "bucket_name": "zikiboard-images"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "zikiboard-db",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "./migrations"
+    }
+  ]
+}

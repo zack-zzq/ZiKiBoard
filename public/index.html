@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ZiKiBoard Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="demo-shell">
+      <section class="demo-post">
+        <p class="demo-kicker">ZiKiBoard</p>
+        <h1>Embeddable blog comments on Cloudflare</h1>
+        <p>
+          This page uses the same widget that a blog page would embed. Change
+          <code>data-blog-id</code> to isolate comment threads per article.
+        </p>
+      </section>
+
+      <div id="zikiboard" data-blog-id="demo/post-1"></div>
+    </main>
+    <script src="/embed.js"></script>
+  </body>
+</html>

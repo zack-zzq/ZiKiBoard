@@ -1,0 +1,315 @@
+:root {
+  color-scheme: light;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: #f5f7f8;
+  color: #16211f;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+button,
+textarea,
+input {
+  font: inherit;
+}
+
+.demo-shell {
+  width: min(980px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 32px 0 56px;
+}
+
+.demo-post {
+  padding: 24px 0 28px;
+}
+
+.demo-kicker {
+  margin: 0 0 8px;
+  color: #147d64;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.demo-post h1 {
+  margin: 0 0 10px;
+  font-size: clamp(2rem, 6vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.demo-post p {
+  max-width: 720px;
+  color: #53605d;
+  line-height: 1.65;
+}
+
+.zb {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #dbe2df;
+  border-radius: 8px;
+  box-shadow: 0 12px 34px rgba(25, 39, 35, 0.08);
+  overflow: hidden;
+}
+
+.zb-header,
+.zb-composer,
+.zb-empty,
+.zb-error {
+  padding: 18px;
+}
+
+.zb-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  border-bottom: 1px solid #e5ebe8;
+}
+
+.zb-title {
+  margin: 0;
+  font-size: 1.1rem;
+  letter-spacing: 0;
+}
+
+.zb-userbar,
+.zb-actions,
+.zb-toolbar,
+.zb-reactions,
+.zb-provider-list {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zb-button,
+.zb-icon-button,
+.zb-provider,
+.zb-reply,
+.zb-reaction {
+  border: 1px solid #cbd6d2;
+  border-radius: 6px;
+  color: #17211f;
+  background: #ffffff;
+  min-height: 34px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.zb-button:hover,
+.zb-icon-button:hover,
+.zb-provider:hover,
+.zb-reply:hover,
+.zb-reaction:hover {
+  border-color: #147d64;
+}
+
+.zb-button-primary {
+  background: #147d64;
+  color: #ffffff;
+  border-color: #147d64;
+}
+
+.zb-icon-button {
+  width: 36px;
+  padding: 0;
+}
+
+.zb-composer {
+  border-bottom: 1px solid #e5ebe8;
+}
+
+.zb-composer textarea {
+  display: block;
+  width: 100%;
+  min-height: 112px;
+  resize: vertical;
+  border: 1px solid #cbd6d2;
+  border-radius: 6px;
+  padding: 12px;
+  line-height: 1.45;
+}
+
+.zb-composer textarea:focus {
+  outline: 3px solid rgba(20, 125, 100, 0.16);
+  border-color: #147d64;
+}
+
+.zb-toolbar {
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.zb-file {
+  display: none;
+}
+
+.zb-emoji-panel,
+.zb-mentions {
+  position: absolute;
+  z-index: 20;
+  margin-top: 6px;
+  background: #ffffff;
+  border: 1px solid #cbd6d2;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(20, 33, 30, 0.14);
+  padding: 8px;
+}
+
+.zb-emoji-panel {
+  display: grid;
+  grid-template-columns: repeat(6, 34px);
+  gap: 4px;
+}
+
+.zb-emoji-panel button,
+.zb-mentions button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.zb-emoji-panel button {
+  width: 34px;
+  height: 34px;
+}
+
+.zb-mentions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px;
+  text-align: left;
+}
+
+.zb-emoji-panel button:hover,
+.zb-mentions button:hover {
+  background: #edf4f1;
+}
+
+.zb-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.zb-comment {
+  padding: 18px;
+  border-bottom: 1px solid #e5ebe8;
+}
+
+.zb-comment:last-child {
+  border-bottom: 0;
+}
+
+.zb-comment .zb-list {
+  margin: 14px 0 0 34px;
+  border-left: 2px solid #e5ebe8;
+}
+
+.zb-comment .zb-comment {
+  padding-right: 0;
+  border-bottom: 0;
+}
+
+.zb-comment-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.zb-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #dfe8e4;
+  object-fit: cover;
+  flex: 0 0 auto;
+}
+
+.zb-author {
+  font-weight: 700;
+}
+
+.zb-handle,
+.zb-time,
+.zb-empty,
+.zb-error,
+.zb-login-copy {
+  color: #65716e;
+}
+
+.zb-markdown {
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.zb-markdown p {
+  margin: 0 0 10px;
+}
+
+.zb-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.zb-markdown img {
+  display: block;
+  max-width: min(100%, 720px);
+  max-height: 420px;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.zb-markdown code {
+  background: #edf2f0;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+.zb-reactions {
+  margin-top: 12px;
+}
+
+.zb-reaction {
+  min-height: 28px;
+  padding: 0 8px;
+}
+
+.zb-reaction-active {
+  background: #e2f3ed;
+  border-color: #147d64;
+}
+
+.zb-login-copy {
+  margin: 0 0 10px;
+}
+
+@media (max-width: 640px) {
+  .demo-shell {
+    width: min(100% - 18px, 980px);
+    padding-top: 16px;
+  }
+
+  .zb-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .zb-comment .zb-list {
+    margin-left: 14px;
+  }
+}
