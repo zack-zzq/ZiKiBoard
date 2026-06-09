@@ -27,7 +27,7 @@
   "kv_namespaces": [
     {
       "binding": "AUTH_CACHE",
-      "id": "00000000000000000000000000000000"
+      "id": "138b7fa6e9d74d24893ba2f1ae4e5332"
     }
   ],
   "r2_buckets": [
@@ -40,7 +40,7 @@
     {
       "binding": "DB",
       "database_name": "zikiboard-db",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "f061e99d-a68d-4d10-934d-27ff8deaf67c",
       "migrations_dir": "./migrations"
     }
   ]
