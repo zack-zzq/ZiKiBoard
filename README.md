@@ -28,8 +28,9 @@ Open `http://localhost:8787`.
 
 ## Auth configuration
 
-Set `AUTH_PROVIDERS` to a JSON array. Keep client secrets in dedicated secret
-variables referenced by `clientSecretEnv`.
+Set `AUTH_PROVIDERS` to a JSON array. Cloudflare does not interpolate one env
+var inside another, so keep OAuth values in dedicated env/secrets and reference
+their key names with `clientIdEnv` and `clientSecretEnv`.
 
 ```json
 [
@@ -38,7 +39,7 @@ variables referenced by `clientSecretEnv`.
     "name": "Google",
     "type": "oidc",
     "issuer": "https://accounts.google.com",
-    "clientId": "GOOGLE_CLIENT_ID",
+    "clientIdEnv": "GOOGLE_CLIENT_ID",
     "clientSecretEnv": "GOOGLE_CLIENT_SECRET"
   },
   {
@@ -46,14 +47,14 @@ variables referenced by `clientSecretEnv`.
     "name": "Microsoft",
     "type": "oidc",
     "issuer": "https://login.microsoftonline.com/common/v2.0",
-    "clientId": "MICROSOFT_CLIENT_ID",
+    "clientIdEnv": "MICROSOFT_CLIENT_ID",
     "clientSecretEnv": "MICROSOFT_CLIENT_SECRET"
   },
   {
     "id": "github",
     "name": "GitHub",
     "type": "github",
-    "clientId": "GITHUB_CLIENT_ID",
+    "clientIdEnv": "GITHUB_CLIENT_ID",
     "clientSecretEnv": "GITHUB_CLIENT_SECRET"
   }
 ]
@@ -62,8 +63,11 @@ variables referenced by `clientSecretEnv`.
 For production secrets:
 
 ```powershell
+npx wrangler secret put GOOGLE_CLIENT_ID
 npx wrangler secret put GOOGLE_CLIENT_SECRET
+npx wrangler secret put MICROSOFT_CLIENT_ID
 npx wrangler secret put MICROSOFT_CLIENT_SECRET
+npx wrangler secret put GITHUB_CLIENT_ID
 npx wrangler secret put GITHUB_CLIENT_SECRET
 ```
 

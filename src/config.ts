@@ -25,7 +25,7 @@ export function publicProviders(env: Env): PublicProvider[] {
     id: provider.id,
     name: provider.name,
     type: provider.type,
-    configured: provider.clientId.length > 0,
+    configured: Boolean(resolveClientId(env, provider) && resolveClientSecret(env, provider)),
   }));
 }
 
@@ -34,16 +34,17 @@ export function resolveProvider(env: Env, providerId: string): RuntimeProvider {
   if (!provider) {
     throw httpError(404, "provider_not_found", "Unknown auth provider");
   }
-  if (!provider.clientId) {
+  const clientId = resolveClientId(env, provider);
+  if (!clientId) {
     throw httpError(400, "provider_not_configured", "Provider clientId is not configured");
   }
 
-  const clientSecret = provider.clientSecret ?? readDynamicSecret(env, provider.clientSecretEnv);
+  const clientSecret = resolveClientSecret(env, provider);
   if (!clientSecret) {
     throw httpError(400, "provider_not_configured", "Provider client secret is not configured");
   }
 
-  return { config: provider, clientSecret };
+  return { config: provider, clientId, clientSecret };
 }
 
 function readProviders(env: Env): ProviderConfig[] {
@@ -76,7 +77,8 @@ function parseProvider(value: unknown): ProviderConfig {
     id,
     name,
     type,
-    clientId: readRequiredString(value, "clientId"),
+    clientId: readOptionalString(value, "clientId"),
+    clientIdEnv: readOptionalString(value, "clientIdEnv"),
     clientSecret: readOptionalString(value, "clientSecret"),
     clientSecretEnv: readOptionalString(value, "clientSecretEnv"),
     issuer: readOptionalString(value, "issuer"),
@@ -101,7 +103,15 @@ function readOptionalString(value: Record<string, unknown>, key: string): string
   return typeof field === "string" && field.trim() ? field.trim() : undefined;
 }
 
-function readDynamicSecret(env: Env, name: string | undefined): string | undefined {
+function resolveClientId(env: Env, provider: ProviderConfig): string | undefined {
+  return provider.clientId ?? readDynamicEnv(env, provider.clientIdEnv);
+}
+
+function resolveClientSecret(env: Env, provider: ProviderConfig): string | undefined {
+  return provider.clientSecret ?? readDynamicEnv(env, provider.clientSecretEnv);
+}
+
+function readDynamicEnv(env: Env, name: string | undefined): string | undefined {
   if (!name) {
     return undefined;
   }

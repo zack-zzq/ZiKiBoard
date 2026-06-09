@@ -77,7 +77,7 @@ export async function handleLogin(request: Request, env: Env, providerId: string
   const authorizationUrl =
     provider.config.type === "github"
       ? await githubAuthorizationUrl(provider, redirectUri, state)
-      : await oidcAuthorizationUrl(env, provider.config, redirectUri, state, nonce, codeVerifier);
+      : await oidcAuthorizationUrl(env, provider, redirectUri, state, nonce, codeVerifier);
 
   return Response.redirect(authorizationUrl.toString(), 302);
 }
@@ -177,18 +177,18 @@ export async function getAuthContext(request: Request, env: Env, ctx: ExecutionC
 
 async function oidcAuthorizationUrl(
   env: Env,
-  provider: ProviderConfig,
+  provider: RuntimeProvider,
   redirectUri: string,
   state: string,
   nonce: string,
   codeVerifier: string,
 ): Promise<URL> {
-  const discovery = await getOidcDiscovery(env, provider);
-  const authorizationUrl = new URL(provider.authorizationEndpoint ?? discovery.authorization_endpoint);
+  const discovery = await getOidcDiscovery(env, provider.config);
+  const authorizationUrl = new URL(provider.config.authorizationEndpoint ?? discovery.authorization_endpoint);
   authorizationUrl.searchParams.set("response_type", "code");
   authorizationUrl.searchParams.set("client_id", provider.clientId);
   authorizationUrl.searchParams.set("redirect_uri", redirectUri);
-  authorizationUrl.searchParams.set("scope", (provider.scopes ?? ["openid", "profile", "email"]).join(" "));
+  authorizationUrl.searchParams.set("scope", (provider.config.scopes ?? ["openid", "profile", "email"]).join(" "));
   authorizationUrl.searchParams.set("state", state);
   authorizationUrl.searchParams.set("nonce", nonce);
   authorizationUrl.searchParams.set("code_challenge", await pkceChallenge(codeVerifier));
@@ -198,7 +198,7 @@ async function oidcAuthorizationUrl(
 
 async function githubAuthorizationUrl(provider: RuntimeProvider, redirectUri: string, state: string): Promise<URL> {
   const authorizationUrl = new URL("https://github.com/login/oauth/authorize");
-  authorizationUrl.searchParams.set("client_id", provider.config.clientId);
+  authorizationUrl.searchParams.set("client_id", provider.clientId);
   authorizationUrl.searchParams.set("redirect_uri", redirectUri);
   authorizationUrl.searchParams.set("scope", (provider.config.scopes ?? ["read:user", "user:email"]).join(" "));
   authorizationUrl.searchParams.set("state", state);
@@ -223,7 +223,7 @@ async function resolveOidcProfile(
   const jwks = createRemoteJWKSet(new URL(provider.config.jwksUri ?? discovery.jwks_uri));
   const verified = await jwtVerify(token.id_token, jwks, {
     issuer: provider.config.issuer ?? discovery.issuer,
-    audience: provider.config.clientId,
+    audience: provider.clientId,
   });
 
   const claims = verified.payload;
@@ -332,7 +332,7 @@ async function exchangeCode(
     grant_type: "authorization_code",
     code,
     redirect_uri: redirectUri,
-    client_id: provider.config.clientId,
+    client_id: provider.clientId,
     client_secret: provider.clientSecret,
     ...extra,
   });

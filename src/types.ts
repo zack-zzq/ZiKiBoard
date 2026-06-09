@@ -4,7 +4,8 @@ export interface ProviderConfig {
   id: string;
   name: string;
   type: ProviderType;
-  clientId: string;
+  clientId?: string;
+  clientIdEnv?: string;
   clientSecret?: string;
   clientSecretEnv?: string;
   issuer?: string;
@@ -73,5 +74,6 @@ export interface ReactionDto {
 
 export interface RuntimeProvider {
   config: ProviderConfig;
+  clientId: string;
   clientSecret: string;
 }
