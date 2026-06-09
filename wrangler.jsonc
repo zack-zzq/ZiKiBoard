@@ -15,12 +15,11 @@
     "not_found_handling": "single-page-application"
   },
   "vars": {
-    "APP_ORIGIN": "http://localhost:8787",
+    "APP_ORIGIN": "https://comment.ziqizhu.com",
     "SESSION_COOKIE_NAME": "zikiboard_session",
     "SESSION_TTL_SECONDS": "2592000",
     "COOKIE_SAME_SITE": "Lax",
-    "CORS_ORIGINS": "http://localhost:8787",
-    "AUTH_PROVIDERS": "[]",
+    "CORS_ORIGINS": "https://ziqizhu.com",
     "MAX_IMAGE_BYTES": "5242880",
     "ALLOWED_IMAGE_TYPES": "image/jpeg,image/png,image/gif,image/webp"
   },

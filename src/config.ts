@@ -1,3 +1,4 @@
+import authProvidersConfig from "../config/auth-providers.json";
 import { httpError, isRecord } from "./http";
 import type { ProviderConfig, PublicProvider, RuntimeProvider } from "./types";
 
@@ -21,7 +22,7 @@ export function maxImageBytes(env: Env): number {
 }
 
 export function publicProviders(env: Env): PublicProvider[] {
-  return readProviders(env).map((provider) => ({
+  return readProviders().map((provider) => ({
     id: provider.id,
     name: provider.name,
     type: provider.type,
@@ -30,7 +31,7 @@ export function publicProviders(env: Env): PublicProvider[] {
 }
 
 export function resolveProvider(env: Env, providerId: string): RuntimeProvider {
-  const provider = readProviders(env).find((candidate) => candidate.id === providerId);
+  const provider = readProviders().find((candidate) => candidate.id === providerId);
   if (!provider) {
     throw httpError(404, "provider_not_found", "Unknown auth provider");
   }
@@ -47,15 +48,10 @@ export function resolveProvider(env: Env, providerId: string): RuntimeProvider {
   return { config: provider, clientId, clientSecret };
 }
 
-function readProviders(env: Env): ProviderConfig[] {
-  let raw: unknown;
-  try {
-    raw = JSON.parse(env.AUTH_PROVIDERS || "[]");
-  } catch {
-    throw httpError(500, "invalid_auth_config", "AUTH_PROVIDERS must be valid JSON");
-  }
+function readProviders(): ProviderConfig[] {
+  const raw: unknown = authProvidersConfig;
   if (!Array.isArray(raw)) {
-    throw httpError(500, "invalid_auth_config", "AUTH_PROVIDERS must be an array");
+    throw httpError(500, "invalid_auth_config", "config/auth-providers.json must be an array");
   }
   return raw.map(parseProvider);
 }

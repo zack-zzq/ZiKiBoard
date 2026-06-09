@@ -28,9 +28,10 @@ Open `http://localhost:8787`.
 
 ## Auth configuration
 
-Set `AUTH_PROVIDERS` to a JSON array. Cloudflare does not interpolate one env
-var inside another, so keep OAuth values in dedicated env/secrets and reference
-their key names with `clientIdEnv` and `clientSecretEnv`.
+Edit `config/auth-providers.json`. This file is bundled into the Worker at
+build time and should only contain provider metadata plus env key names. Keep
+real OAuth values in Cloudflare vars/secrets referenced by `clientIdEnv` and
+`clientSecretEnv`.
 
 ```json
 [
