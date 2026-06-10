@@ -1,3 +1,52 @@
+/* Custom properties for light/dark themes */
+.zb {
+  color-scheme: light dark;
+  
+  /* System font stack */
+  --zb-font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  
+  /* Light mode colors */
+  --zb-accent: hsl(250, 84%, 54%);
+  --zb-accent-hover: hsl(250, 80%, 48%);
+  --zb-accent-soft: rgba(99, 102, 241, 0.08);
+  --zb-bg: hsl(0, 0%, 100%);
+  --zb-surface: hsl(210, 20%, 98%);
+  --zb-line: hsl(220, 13%, 90%);
+  --zb-line-strong: hsl(220, 13%, 82%);
+  --zb-text: hsl(224, 71%, 4%);
+  --zb-muted: hsl(220, 9%, 40%);
+  --zb-success: hsl(142, 72%, 29%);
+  --zb-success-dark: hsl(142, 72%, 24%);
+  --zb-amber: hsl(35, 92%, 45%);
+  --zb-amber-active-bg: hsl(35, 92%, 96%);
+  --zb-amber-active-text: hsl(35, 92%, 25%);
+  --zb-shadow: 0 12px 30px rgba(15, 23, 42, 0.04), 0 0 0 1px rgba(15, 23, 42, 0.03);
+  
+  /* Default button settings */
+  --zb-btn-radius: 8px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .zb {
+    /* Dark mode colors */
+    --zb-accent: hsl(250, 95%, 70%);
+    --zb-accent-hover: hsl(250, 95%, 76%);
+    --zb-accent-soft: rgba(165, 180, 252, 0.12);
+    --zb-bg: hsl(222, 47%, 9%);
+    --zb-surface: hsl(222, 47%, 6%);
+    --zb-line: hsl(222, 32%, 16%);
+    --zb-line-strong: hsl(222, 32%, 24%);
+    --zb-text: hsl(210, 40%, 98%);
+    --zb-muted: hsl(215, 20%, 65%);
+    --zb-success: hsl(142, 70%, 45%);
+    --zb-success-dark: hsl(142, 70%, 40%);
+    --zb-amber: hsl(35, 90%, 60%);
+    --zb-amber-active-bg: hsl(35, 90%, 15%);
+    --zb-amber-active-text: hsl(35, 90%, 80%);
+    --zb-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  }
+}
+
 .zb,
 .zb *,
 .zb *::before,
@@ -12,34 +61,15 @@
 }
 
 .zb {
-  --zb-accent: #0f7b62;
-  --zb-accent-dark: #0b604e;
-  --zb-amber: #b96a12;
-  --zb-bg: #fbfcfc;
-  --zb-surface: #ffffff;
-  --zb-soft: #f4f8f6;
-  --zb-line: #dce5e1;
-  --zb-line-strong: #c7d3ce;
-  --zb-text: #17211f;
-  --zb-muted: #66736f;
-  --zb-github-blue: #0969da;
-  --zb-github-border: #d0d7de;
-  --zb-github-muted: #57606a;
-  --zb-github-soft: #f6f8fa;
-  --zb-success: #1f883d;
-  --zb-success-dark: #1a7f37;
-  --zb-shadow: 0 18px 48px rgba(17, 32, 28, 0.1);
-  color-scheme: light;
   width: 100%;
   overflow: hidden;
   border: 1px solid var(--zb-line);
-  border-radius: 8px;
+  border-radius: 16px;
   background: var(--zb-bg);
   color: var(--zb-text);
   box-shadow: var(--zb-shadow);
-  font-family:
-    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-    sans-serif;
+  font-family: var(--zb-font-sans);
+  transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
 }
 
 .zb [hidden] {
@@ -50,7 +80,7 @@
 .zb-composer,
 .zb-empty,
 .zb-error {
-  padding: 18px;
+  padding: 24px;
 }
 
 .zb-header {
@@ -59,20 +89,20 @@
   justify-content: space-between;
   gap: 16px;
   border-bottom: 1px solid var(--zb-line);
-  background: linear-gradient(180deg, #ffffff 0%, #f8fbfa 100%);
+  background: var(--zb-surface);
 }
 
 .zb-title-wrap {
   display: grid;
-  gap: 3px;
+  gap: 4px;
 }
 
 .zb-title {
   margin: 0;
-  font-size: 1.05rem;
-  font-weight: 780;
+  font-size: 1.25rem;
+  font-weight: 800;
   line-height: 1.2;
-  letter-spacing: 0;
+  letter-spacing: -0.3px;
 }
 
 .zb-count,
@@ -83,7 +113,11 @@
 .zb-login-copy,
 .zb-editor-meta {
   color: var(--zb-muted);
-  font-size: 0.86rem;
+  font-size: 0.875rem;
+}
+
+.zb-count {
+  font-weight: 500;
 }
 
 .zb-userbar,
@@ -94,7 +128,7 @@
 .zb-formatbar {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   flex-wrap: wrap;
 }
 
@@ -104,14 +138,138 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   border: 1px solid var(--zb-line);
-  border-radius: 999px;
-  background: #ffffff;
+  border-radius: 99px;
+  background: var(--zb-surface);
   color: var(--zb-text);
-  padding: 7px 10px;
-  font-size: 0.88rem;
-  font-weight: 680;
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
+.zb .zb-provider-list {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.zb .zb-provider {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 38px;
+  border: 1px solid var(--zb-line-strong);
+  border-radius: var(--zb-btn-radius);
+  background: var(--zb-surface);
+  color: var(--zb-text);
+  font-weight: 600;
+  font-size: 0.875rem;
+  padding: 0 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zb .zb-provider:hover {
+  border-color: var(--zb-accent);
+  background: var(--zb-accent-soft);
+  box-shadow: 0 4px 12px var(--zb-accent-soft);
+}
+
+.zb .zb-provider-github {
+  border-color: #24292f;
+  background: #24292f;
+  color: #ffffff;
+}
+
+.zb .zb-provider-github:hover {
+  border-color: #1a1e22;
+  background: #1a1e22;
+  color: #ffffff;
+}
+
+/* Wide login buttons in Composer when logged out */
+.zb .zb-provider-wide {
+  justify-content: flex-start;
+  min-width: 200px;
+  min-height: 48px;
+  padding: 0 16px;
+}
+
+.zb .zb-provider-compact {
+  padding: 0 12px;
+  min-height: 36px;
+}
+
+.zb .zb-provider-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.zb .zb-provider-icon svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+}
+
+.zb .zb-provider-label {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  text-align: left;
+  line-height: 1.2;
+}
+
+.zb .zb-provider-label small {
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+/* Logged out composer banner */
+.zb .zb-login-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  border: 1px dashed var(--zb-line-strong);
+  border-radius: 12px;
+  background: var(--zb-surface);
+  padding: 24px;
+  transition: border-color 0.3s;
+}
+
+.zb .zb-login-text {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.zb .zb-login-text strong {
+  color: var(--zb-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.zb .zb-login-text span {
+  color: var(--zb-muted);
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.zb .zb-login-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Button UI */
 .zb-button,
 .zb-icon-button,
 .zb-provider,
@@ -120,52 +278,60 @@
 .zb-segment,
 .zb-link-button {
   border: 1px solid var(--zb-line-strong);
-  border-radius: 6px;
-  background: #ffffff;
+  border-radius: var(--zb-btn-radius);
+  background: var(--zb-bg);
   color: var(--zb-text);
-  min-height: 34px;
-  padding: 0 12px;
-  font-size: 0.9rem;
-  font-weight: 680;
+  min-height: 38px;
+  padding: 0 16px;
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition:
-    border-color 150ms ease,
-    background 150ms ease,
-    color 150ms ease,
-    box-shadow 150ms ease,
-    transform 150ms ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s ease;
 }
 
 .zb-button:hover,
 .zb-icon-button:hover,
-.zb-provider:hover,
 .zb-reply:hover,
 .zb-reaction:hover,
 .zb-segment:hover,
 .zb-link-button:hover {
   border-color: var(--zb-accent);
-  box-shadow: 0 4px 14px rgba(15, 123, 98, 0.12);
+  background: var(--zb-accent-soft);
+  color: var(--zb-text);
+}
+
+.zb-button:focus-visible,
+.zb-icon-button:focus-visible,
+.zb-reply:focus-visible,
+.zb-reaction:focus-visible {
+  outline: 2px solid var(--zb-accent);
+  outline-offset: 1px;
 }
 
 .zb-button:active,
 .zb-icon-button:active,
-.zb-provider:active,
 .zb-reply:active,
 .zb-reaction:active,
 .zb-segment:active {
   transform: translateY(1px);
 }
 
+/* Primary Button Accent */
 .zb-button-primary {
-  border-color: rgba(31, 136, 61, 0.62);
-  background: var(--zb-success);
-  color: #ffffff;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  border-color: var(--zb-accent);
+  background: var(--zb-accent);
+  color: #ffffff !important;
+  box-shadow: 0 2px 4px rgba(99, 102, 241, 0.1);
 }
 
 .zb-button-primary:hover {
-  border-color: rgba(31, 136, 61, 0.78);
-  background: var(--zb-success-dark);
+  border-color: var(--zb-accent-hover);
+  background: var(--zb-accent-hover);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
 }
 
 .zb-link-button {
@@ -173,23 +339,25 @@
   border: 0;
   background: transparent;
   color: var(--zb-accent);
-  padding: 0 2px;
+  padding: 0 4px;
+}
+
+.zb-link-button:hover {
+  background: var(--zb-accent-soft);
+  border-color: transparent;
 }
 
 .zb-icon-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  min-width: 36px;
+  width: 38px;
+  min-width: 38px;
   padding: 0;
-  font-weight: 800;
 }
 
+/* Composer Container */
 .zb-composer {
   position: relative;
   border-bottom: 1px solid var(--zb-line);
-  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
+  background: var(--zb-bg);
 }
 
 .zb-replying {
@@ -197,121 +365,119 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
-  border: 1px solid #d8e8e1;
+  margin-bottom: 16px;
+  border: 1px solid var(--zb-line);
   border-radius: 8px;
-  background: #f1faf6;
-  padding: 9px 10px;
-  color: var(--zb-accent-dark);
-  font-size: 0.9rem;
-  font-weight: 680;
+  background: var(--zb-accent-soft);
+  padding: 10px 16px;
+  color: var(--zb-text);
+  font-size: 0.875rem;
+  font-weight: 600;
 }
 
+/* The Editor Shell Card */
 .zb-editor-shell {
   overflow: hidden;
-  border: 1px solid var(--zb-github-border);
-  border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
+  border: 1px solid var(--zb-line-strong);
+  border-radius: 12px;
+  background: var(--zb-bg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .zb-editor-shell:focus-within {
-  border-color: var(--zb-github-blue);
-  box-shadow:
-    0 0 0 3px rgba(9, 105, 218, 0.12),
-    0 1px 0 rgba(27, 31, 36, 0.04);
+  border-color: var(--zb-accent);
+  box-shadow: 0 0 0 3px var(--zb-accent-soft);
 }
 
+/* Segmented header of Editor */
 .zb-editor-head {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: space-between;
-  min-height: 44px;
-  border-bottom: 1px solid var(--zb-github-border);
-  background: var(--zb-github-soft);
-  padding: 0 10px;
+  min-height: 48px;
+  border-bottom: 1px solid var(--zb-line);
+  background: var(--zb-surface);
+  padding: 0 12px;
 }
 
 .zb-segments {
   display: inline-flex;
-  align-self: stretch;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  padding: 3px;
   gap: 2px;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  .zb-segments {
+    background: rgba(255, 255, 255, 0.04);
+  }
 }
 
 .zb-segment {
-  position: relative;
-  min-height: 44px;
-  border: 1px solid transparent;
-  border-radius: 6px 6px 0 0;
+  min-height: unset;
+  border: 0;
+  border-radius: 6px;
   background: transparent;
-  color: var(--zb-github-muted);
-  padding: 0 14px;
-  box-shadow: none;
-  font-size: 0.88rem;
-  font-weight: 650;
+  color: var(--zb-muted);
+  padding: 6px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 
 .zb-segment:hover {
-  border-color: transparent;
-  background: rgba(175, 184, 193, 0.14);
-  box-shadow: none;
+  background: rgba(0, 0, 0, 0.02);
   color: var(--zb-text);
 }
 
-.zb-segment:active,
-.zb-format-button:active {
+@media (prefers-color-scheme: dark) {
+  .zb-segment:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+}
+
+.zb-segment:active {
   transform: none;
 }
 
 .zb-segment-active,
 .zb-segment-active:hover {
-  margin-bottom: -1px;
-  border-color: var(--zb-github-border);
-  border-bottom-color: #ffffff;
-  background: #ffffff;
+  background: var(--zb-bg);
   color: var(--zb-text);
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 .zb-editor-body {
-  background: #ffffff;
+  background: var(--zb-bg);
 }
 
 .zb-formatbar {
+  display: flex;
   align-items: center;
-  flex: 1 1 280px;
   gap: 2px;
-  width: auto;
-  min-width: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  padding: 0;
 }
 
 .zb-format-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  width: 32px;
   height: 32px;
-  min-height: 32px;
+  min-height: unset;
   border: 0;
+  border-radius: 6px;
   background: transparent;
-  color: var(--zb-github-muted);
-  box-shadow: none;
-  font-weight: 720;
+  color: var(--zb-muted);
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .zb-format-button strong,
 .zb-format-button .zb-italic-icon {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   line-height: 1;
 }
 
@@ -319,7 +485,7 @@
   display: inline-block;
   font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
-  font-weight: 760;
+  font-weight: bold;
 }
 
 .zb-format-svg {
@@ -329,54 +495,53 @@
 }
 
 .zb-format-button:hover {
-  border-color: transparent;
-  background: rgba(175, 184, 193, 0.2);
-  box-shadow: none;
-  color: var(--zb-text);
+  background: var(--zb-accent-soft);
+  color: var(--zb-accent);
 }
 
 .zb-editor-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid var(--zb-github-border);
-  background: var(--zb-github-soft);
-  padding: 8px;
+  gap: 16px;
+  border-top: 1px solid var(--zb-line);
+  background: var(--zb-surface);
+  padding: 10px 16px;
 }
 
 .zb-toolbar {
-  flex: 0 0 auto;
+  flex-shrink: 0;
   justify-content: flex-end;
-  gap: 12px;
-  min-width: 0;
+  gap: 16px;
   margin-top: 0;
 }
 
 .zb-editor-meta {
-  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
 }
 
 .zb-actions {
-  flex: 0 0 auto;
+  flex-shrink: 0;
 }
 
 .zb-actions .zb-button-primary {
-  min-height: 32px;
+  min-height: 34px;
   border-radius: 6px;
-  padding: 0 14px;
+  padding: 0 16px;
 }
 
 .zb-composer textarea {
   display: block;
   width: 100%;
-  min-height: 152px;
+  min-height: 140px;
   resize: vertical;
   border: 0;
   background: transparent;
-  padding: 14px 16px;
+  padding: 18px;
   color: var(--zb-text);
-  line-height: 1.55;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .zb-composer textarea:focus {
@@ -384,64 +549,77 @@
 }
 
 .zb-preview {
-  min-height: 152px;
-  padding: 14px 16px;
+  min-height: 140px;
+  padding: 18px;
 }
 
 .zb-preview-empty {
   color: var(--zb-muted);
+  font-style: italic;
 }
 
 .zb-file {
   display: none;
 }
 
+/* Floating Emoji and Mention panels */
 .zb-emoji-panel,
 .zb-mentions {
   position: absolute;
   z-index: 20;
   margin-top: 8px;
-  border: 1px solid var(--zb-line-strong);
-  border-radius: 8px;
-  background: #ffffff;
-  box-shadow: 0 18px 40px rgba(20, 33, 30, 0.16);
+  border: 1px solid var(--zb-line);
+  border-radius: 12px;
+  background: var(--zb-bg);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   padding: 8px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .zb-emoji-panel {
   display: grid;
-  grid-template-columns: repeat(6, 34px);
+  grid-template-columns: repeat(6, 36px);
   gap: 4px;
 }
 
 .zb-emoji-panel button,
 .zb-mentions button {
   border: 0;
-  border-radius: 6px;
+  border-radius: 8px;
   background: transparent;
   cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
 }
 
 .zb-emoji-panel button {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
+  font-size: 1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .zb-mentions button {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   width: 100%;
-  padding: 8px;
+  padding: 8px 12px;
   color: var(--zb-text);
   text-align: left;
+  font-weight: 600;
+  font-size: 0.875rem;
 }
 
 .zb-emoji-panel button:hover,
 .zb-mentions button:hover {
-  background: #edf5f2;
+  background: var(--zb-accent-soft);
+  transform: scale(1.05);
 }
 
+/* Comments Feed */
 .zb-list {
   margin: 0;
   padding: 0;
@@ -450,23 +628,25 @@
 }
 
 .zb-comment {
-  padding: 18px;
+  padding: 24px;
   border-bottom: 1px solid var(--zb-line);
-  background: #ffffff;
+  background: var(--zb-bg);
+  transition: background 0.3s;
 }
 
 .zb-comment:last-child {
   border-bottom: 0;
 }
 
+/* Indented replies list */
 .zb-comment .zb-list {
-  margin: 14px 0 0 34px;
-  border-left: 2px solid #dfe9e4;
+  margin: 18px 0 0 20px;
+  border-left: 2px solid var(--zb-line-strong);
   background: transparent;
 }
 
 .zb-comment .zb-comment {
-  padding: 14px 0 0 16px;
+  padding: 16px 0 0 20px;
   border-bottom: 0;
   background: transparent;
 }
@@ -474,34 +654,47 @@
 .zb-comment-head {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 9px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .zb-avatar {
-  width: 32px;
-  height: 32px;
-  flex: 0 0 auto;
-  border: 1px solid var(--zb-line);
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  border: 2px solid var(--zb-bg);
   border-radius: 50%;
-  background:
-    linear-gradient(135deg, rgba(15, 123, 98, 0.18), rgba(185, 106, 18, 0.18)),
-    #eef4f1;
+  background: linear-gradient(135deg, var(--zb-accent-soft), var(--zb-line-strong));
   object-fit: cover;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .zb-author {
-  font-weight: 760;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--zb-text);
 }
 
+.zb-handle {
+  color: var(--zb-muted);
+  font-weight: 500;
+}
+
+.zb-time {
+  font-size: 0.8rem;
+  color: var(--zb-muted);
+}
+
+/* Comment text markdown renderer classes */
 .zb-markdown {
   overflow-wrap: anywhere;
   color: var(--zb-text);
-  line-height: 1.62;
+  line-height: 1.6;
+  font-size: 0.95rem;
 }
 
 .zb-markdown p {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
 }
 
 .zb-markdown p:last-child {
@@ -510,47 +703,91 @@
 
 .zb-markdown a {
   color: var(--zb-accent);
-  font-weight: 680;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px dashed var(--zb-accent);
+  transition: border-bottom-color 0.2s;
+}
+
+.zb-markdown a:hover {
+  border-bottom-style: solid;
 }
 
 .zb-markdown img {
   display: block;
-  max-width: min(100%, 720px);
-  max-height: 420px;
-  margin: 12px 0;
+  max-width: 100%;
+  max-height: 400px;
+  margin: 16px 0;
   border: 1px solid var(--zb-line);
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .zb-markdown code {
-  border: 1px solid #dbe4e0;
-  border-radius: 5px;
-  background: #f1f5f3;
-  padding: 2px 5px;
-  color: #23302d;
-  font-size: 0.92em;
+  border: 1px solid var(--zb-line);
+  border-radius: 6px;
+  background: var(--zb-surface);
+  padding: 3px 6px;
+  color: var(--zb-text);
+  font-size: 0.875em;
+  font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 .zb-mention {
-  color: var(--zb-accent-dark);
-  font-weight: 760;
+  color: var(--zb-accent);
+  font-weight: 700;
+  background: var(--zb-accent-soft);
+  padding: 1px 6px;
+  border-radius: 4px;
 }
 
+/* Reactions pill */
 .zb-reactions {
-  margin-top: 12px;
+  margin-top: 16px;
 }
 
 .zb-reaction {
-  min-height: 30px;
-  padding: 0 9px;
+  min-height: 32px;
+  padding: 0 12px;
   color: var(--zb-muted);
-  font-weight: 720;
+  font-weight: 600;
+  border-radius: 99px;
+  background: var(--zb-surface);
+  border-color: var(--zb-line);
+}
+
+.zb-reaction:hover {
+  transform: scale(1.05);
+  background: var(--zb-accent-soft);
+  border-color: var(--zb-accent);
+  color: var(--zb-text);
 }
 
 .zb-reaction-active {
   border-color: var(--zb-amber);
-  background: #fff6e8;
-  color: #7c4308;
+  background: var(--zb-amber-active-bg);
+  color: var(--zb-amber-active-text);
+}
+
+.zb-reaction-active:hover {
+  background: var(--zb-amber-active-bg);
+  border-color: var(--zb-amber);
+  color: var(--zb-amber-active-text);
+}
+
+.zb-reply {
+  min-height: 32px;
+  border-radius: 99px;
+  padding: 0 14px;
+  background: transparent;
+  border-color: transparent;
+  color: var(--zb-muted);
+}
+
+.zb-reply:hover {
+  border-color: var(--zb-line-strong);
+  background: var(--zb-surface);
+  color: var(--zb-text);
 }
 
 .zb-login-copy {
@@ -558,21 +795,47 @@
 }
 
 .zb-error {
-  border-bottom: 1px solid #f3d0c4;
-  background: #fff4ef;
-  color: #8a351c;
+  border-bottom: 1px solid hsla(12, 80%, 50%, 0.2);
+  background: hsla(12, 80%, 50%, 0.05);
+  color: hsl(12, 80%, 45%);
+  border-radius: 8px;
+  margin: 12px 24px;
+  padding: 12px 16px;
 }
 
 @media (max-width: 640px) {
   .zb-header {
     align-items: flex-start;
     flex-direction: column;
+    padding: 18px;
+  }
+
+  .zb-composer {
+    padding: 18px;
   }
 
   .zb-userbar,
   .zb-actions,
   .zb-toolbar {
     width: 100%;
+  }
+
+  .zb-provider-list,
+  .zb-login-actions {
+    justify-content: stretch;
+    width: 100%;
+  }
+
+  .zb-provider-compact,
+  .zb-provider-wide {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+
+  .zb-login-panel {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 16px;
   }
 
   .zb-editor-footer {
@@ -583,15 +846,21 @@
   .zb-formatbar {
     flex: 1 1 auto;
     width: 100%;
+    justify-content: space-between;
   }
 
   .zb-toolbar {
     align-items: stretch;
-    flex-direction: column;
+    flex-direction: column-reverse;
+    gap: 12px;
   }
 
   .zb-button-primary {
     width: 100%;
+  }
+
+  .zb-comment {
+    padding: 18px;
   }
 
   .zb-comment .zb-list {

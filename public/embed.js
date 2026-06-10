@@ -79,17 +79,7 @@
         bar.append(logout);
       } else {
         const providers = el("div", "zb-provider-list");
-        state.providers.forEach((provider) => {
-          if (!provider.configured) {
-            return;
-          }
-          providers.append(
-            button(provider.name, "zb-provider", () => {
-              const redirect = encodeURIComponent(window.location.href);
-              window.location.href = `${apiBase}/api/auth/login/${encodeURIComponent(provider.id)}?redirect=${redirect}`;
-            }),
-          );
-        });
+        configuredProviders().forEach((provider) => providers.append(providerLoginButton(provider, "compact")));
         if (!providers.childNodes.length) {
           providers.append(el("span", "zb-login-copy", "No login provider configured."));
         }
@@ -102,7 +92,19 @@
     function composer() {
       const wrap = el("div", "zb-composer");
       if (!state.user) {
-        wrap.append(el("p", "zb-login-copy", "Sign in to join the discussion."));
+        const loginPanel = el("div", "zb-login-panel");
+        const loginText = el("div", "zb-login-text");
+        loginText.append(el("strong", "", "Sign in to join the discussion"));
+        loginText.append(el("span", "", "Use your existing account to comment and reply."));
+        loginPanel.append(loginText);
+
+        const providers = el("div", "zb-login-actions");
+        configuredProviders().forEach((provider) => providers.append(providerLoginButton(provider, "wide")));
+        if (!providers.childNodes.length) {
+          providers.append(el("span", "zb-login-copy", "No login provider configured."));
+        }
+        loginPanel.append(providers);
+        wrap.append(loginPanel);
         return wrap;
       }
 
@@ -232,6 +234,22 @@
       editorShell.append(editorFooter);
       wrap.append(editorShell);
       return wrap;
+    }
+
+    function configuredProviders() {
+      return state.providers.filter((provider) => provider.configured);
+    }
+
+    function providerLoginButton(provider, variant) {
+      const node = document.createElement("button");
+      node.type = "button";
+      node.className = `zb-provider zb-provider-${providerKey(provider)} zb-provider-${variant}`;
+      node.innerHTML = `${providerIcon(provider)}<span class="zb-provider-label"><span>${escapeHtml(provider.name)}</span>${variant === "wide" ? `<small>Continue with ${escapeHtml(provider.name)}</small>` : ""}</span>`;
+      node.addEventListener("click", () => {
+        const redirect = encodeURIComponent(window.location.href);
+        window.location.href = `${apiBase}/api/auth/login/${encodeURIComponent(provider.id)}?redirect=${redirect}`;
+      });
+      return node;
     }
 
     function commentNode(comment) {
@@ -394,6 +412,28 @@
 
   function formatButton(label, title, onClick) {
     return button(label, "zb-icon-button zb-format-button", onClick, title);
+  }
+
+  function providerKey(provider) {
+    const key = `${provider.id || ""} ${provider.name || ""} ${provider.type || ""}`.toLowerCase();
+    if (key.includes("google")) {
+      return "google";
+    }
+    if (key.includes("github")) {
+      return "github";
+    }
+    return "generic";
+  }
+
+  function providerIcon(provider) {
+    const key = providerKey(provider);
+    if (key === "google") {
+      return '<span class="zb-provider-icon" aria-hidden="true"><svg viewBox="0 0 18 18" focusable="false"><path fill="#4285f4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.72v2.26h2.92c1.7-1.57 2.68-3.88 2.68-6.62Z"/><path fill="#34a853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.92-2.26c-.8.54-1.84.86-3.04.86-2.34 0-4.33-1.58-5.04-3.72H.94v2.33A9 9 0 0 0 9 18Z"/><path fill="#fbbc05" d="M3.96 10.7A5.41 5.41 0 0 1 3.68 9c0-.59.1-1.16.28-1.7V4.97H.94A9 9 0 0 0 0 9c0 1.45.34 2.82.94 4.03l3.02-2.33Z"/><path fill="#ea4335" d="M9 3.58c1.32 0 2.5.45 3.43 1.35l2.6-2.6A8.7 8.7 0 0 0 9 0 9 9 0 0 0 .94 4.97L3.96 7.3C4.67 5.16 6.66 3.58 9 3.58Z"/></svg></span>';
+    }
+    if (key === "github") {
+      return '<span class="zb-provider-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path fill="currentColor" d="M8 .2a8 8 0 0 0-2.53 15.59c.4.07.55-.17.55-.38v-1.34c-2.23.49-2.7-1.08-2.7-1.08-.37-.93-.9-1.18-.9-1.18-.73-.5.06-.49.06-.49.8.06 1.23.83 1.23.83.72 1.22 1.88.87 2.34.66.07-.52.28-.87.5-1.07-1.78-.2-3.65-.9-3.65-3.96 0-.88.31-1.6.82-2.16-.08-.2-.36-1.03.08-2.13 0 0 .68-.22 2.2.82A7.65 7.65 0 0 1 8 3.73c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.93.08 2.13.52.56.82 1.28.82 2.16 0 3.07-1.87 3.75-3.66 3.95.29.25.55.74.55 1.5v2.22c0 .21.14.46.55.38A8 8 0 0 0 8 .2Z"/></svg></span>';
+    }
+    return '<span class="zb-provider-icon" aria-hidden="true"><svg viewBox="0 0 16 16" focusable="false"><path fill="none" stroke="currentColor" stroke-width="1.5" d="M8 8.25A3.1 3.1 0 1 0 8 2a3.1 3.1 0 0 0 0 6.25Zm5.25 6.15c-.54-2.25-2.56-3.9-5.25-3.9s-4.71 1.65-5.25 3.9"/></svg></span>';
   }
 
   function linkIcon() {
