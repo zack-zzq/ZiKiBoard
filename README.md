@@ -97,3 +97,4 @@ npm run deploy
 ```
 
 Each unique `data-blog-id` has a separate comment thread.
+Blog IDs may include Unicode letters and numbers, plus `.`, `_`, `:`, `/`, and `-`.

@@ -15,7 +15,7 @@ interface MentionRow {
   avatar_url: string | null;
 }
 
-const BLOG_ID_PATTERN = /^[a-zA-Z0-9][a-zA-Z0-9_.:/-]{0,190}$/;
+const BLOG_ID_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M}_.:/-]{0,190}$/u;
 const ALLOWED_REACTIONS = new Set(["👍", "❤️", "😂", "🎉", "👀", "🚀"]);
 
 export async function listComments(request: Request, env: Env, user: User | null, blogId: string): Promise<Response> {
