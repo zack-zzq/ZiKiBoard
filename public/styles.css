@@ -22,6 +22,12 @@
   --zb-line-strong: #c7d3ce;
   --zb-text: #17211f;
   --zb-muted: #66736f;
+  --zb-github-blue: #0969da;
+  --zb-github-border: #d0d7de;
+  --zb-github-muted: #57606a;
+  --zb-github-soft: #f6f8fa;
+  --zb-success: #1f883d;
+  --zb-success-dark: #1a7f37;
   --zb-shadow: 0 18px 48px rgba(17, 32, 28, 0.1);
   color-scheme: light;
   width: 100%;
@@ -151,14 +157,15 @@
 }
 
 .zb-button-primary {
-  border-color: var(--zb-accent);
-  background: var(--zb-accent);
+  border-color: rgba(31, 136, 61, 0.62);
+  background: var(--zb-success);
   color: #ffffff;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 .zb-button-primary:hover {
-  border-color: var(--zb-accent-dark);
-  background: var(--zb-accent-dark);
+  border-color: rgba(31, 136, 61, 0.78);
+  background: var(--zb-success-dark);
 }
 
 .zb-link-button {
@@ -182,7 +189,7 @@
 .zb-composer {
   position: relative;
   border-bottom: 1px solid var(--zb-line);
-  background: #ffffff;
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
 }
 
 .zb-replying {
@@ -200,88 +207,189 @@
   font-weight: 680;
 }
 
-.zb-formatbar {
-  align-items: center;
-  width: 100%;
-  border: 1px solid var(--zb-line);
-  border-radius: 8px 8px 0 0;
-  background: var(--zb-soft);
-  padding: 7px;
+.zb-editor-shell {
+  overflow: hidden;
+  border: 1px solid var(--zb-github-border);
+  border-radius: 6px;
+  background: #ffffff;
+  box-shadow: 0 1px 0 rgba(27, 31, 36, 0.04);
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
-.zb-format-button {
-  background: #ffffff;
+.zb-editor-shell:focus-within {
+  border-color: var(--zb-github-blue);
+  box-shadow:
+    0 0 0 3px rgba(9, 105, 218, 0.12),
+    0 1px 0 rgba(27, 31, 36, 0.04);
 }
 
 .zb-editor-head {
   display: flex;
-  justify-content: flex-end;
-  border-right: 1px solid var(--zb-line);
-  border-left: 1px solid var(--zb-line);
-  background: #ffffff;
-  padding: 8px;
+  align-items: flex-end;
+  justify-content: space-between;
+  min-height: 44px;
+  border-bottom: 1px solid var(--zb-github-border);
+  background: var(--zb-github-soft);
+  padding: 0 10px;
 }
 
 .zb-segments {
   display: inline-flex;
-  border: 1px solid var(--zb-line);
-  border-radius: 8px;
-  background: #edf3f0;
-  padding: 3px;
+  align-self: stretch;
+  gap: 2px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
 }
 
 .zb-segment {
-  min-height: 28px;
-  border: 0;
-  border-radius: 6px;
+  position: relative;
+  min-height: 44px;
+  border: 1px solid transparent;
+  border-radius: 6px 6px 0 0;
   background: transparent;
-  color: var(--zb-muted);
-  padding: 0 12px;
+  color: var(--zb-github-muted);
+  padding: 0 14px;
+  box-shadow: none;
+  font-size: 0.88rem;
+  font-weight: 650;
+}
+
+.zb-segment:hover {
+  border-color: transparent;
+  background: rgba(175, 184, 193, 0.14);
+  box-shadow: none;
+  color: var(--zb-text);
+}
+
+.zb-segment:active,
+.zb-format-button:active {
+  transform: none;
+}
+
+.zb-segment-active,
+.zb-segment-active:hover {
+  margin-bottom: -1px;
+  border-color: var(--zb-github-border);
+  border-bottom-color: #ffffff;
+  background: #ffffff;
+  color: var(--zb-text);
   box-shadow: none;
 }
 
-.zb-segment-active {
+.zb-editor-body {
   background: #ffffff;
-  color: var(--zb-text);
-  box-shadow: 0 2px 8px rgba(20, 33, 29, 0.08);
 }
 
-.zb-editor-shell {
-  border: 1px solid var(--zb-line);
-  border-top: 0;
-  border-radius: 0 0 8px 8px;
-  background: #ffffff;
+.zb-formatbar {
+  align-items: center;
+  flex: 1 1 280px;
+  gap: 2px;
+  width: auto;
+  min-width: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
+
+.zb-format-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-height: 32px;
+  border: 0;
+  background: transparent;
+  color: var(--zb-github-muted);
+  box-shadow: none;
+  font-weight: 720;
+}
+
+.zb-format-button strong,
+.zb-format-button .zb-italic-icon {
+  font-size: 0.92rem;
+  line-height: 1;
+}
+
+.zb-format-button .zb-italic-icon {
+  display: inline-block;
+  font-family: Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 760;
+}
+
+.zb-format-svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.zb-format-button:hover {
+  border-color: transparent;
+  background: rgba(175, 184, 193, 0.2);
+  box-shadow: none;
+  color: var(--zb-text);
+}
+
+.zb-editor-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--zb-github-border);
+  background: var(--zb-github-soft);
+  padding: 8px;
+}
+
+.zb-toolbar {
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  margin-top: 0;
+}
+
+.zb-editor-meta {
+  white-space: nowrap;
+}
+
+.zb-actions {
+  flex: 0 0 auto;
+}
+
+.zb-actions .zb-button-primary {
+  min-height: 32px;
+  border-radius: 6px;
+  padding: 0 14px;
 }
 
 .zb-composer textarea {
   display: block;
   width: 100%;
-  min-height: 132px;
+  min-height: 152px;
   resize: vertical;
   border: 0;
   background: transparent;
-  padding: 14px;
+  padding: 14px 16px;
   color: var(--zb-text);
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .zb-composer textarea:focus {
-  outline: 3px solid rgba(15, 123, 98, 0.14);
-  outline-offset: -3px;
+  outline: 0;
 }
 
 .zb-preview {
-  min-height: 132px;
-  padding: 14px;
+  min-height: 152px;
+  padding: 14px 16px;
 }
 
 .zb-preview-empty {
   color: var(--zb-muted);
-}
-
-.zb-toolbar {
-  justify-content: space-between;
-  margin-top: 12px;
 }
 
 .zb-file {
@@ -467,8 +575,18 @@
     width: 100%;
   }
 
+  .zb-editor-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .zb-formatbar {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+
   .zb-toolbar {
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
   }
 

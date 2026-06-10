@@ -127,7 +127,7 @@
       let preview;
       const textarea = document.createElement("textarea");
       textarea.value = state.draft;
-      textarea.placeholder = state.replyTo && state.replyTo.author ? `Reply to @${state.replyTo.author.handle}` : "Write a comment";
+      textarea.placeholder = state.replyTo && state.replyTo.author ? `Leave a reply to @${state.replyTo.author.handle}` : "Leave a comment";
       textarea.addEventListener("input", () => {
         state.draft = textarea.value;
         if (meta) {
@@ -158,41 +158,44 @@
 
       const formatbar = el("div", "zb-formatbar");
       formatbar.append(file);
-      formatbar.append(formatButton("B", "Bold", () => wrapSelection(textarea, "**", "**", "bold text")));
-      formatbar.append(formatButton("<i>I</i>", "Italic", () => wrapSelection(textarea, "*", "*", "italic text")));
-      formatbar.append(formatButton("&#128279;", "Link", () => insertLink(textarea)));
+      formatbar.append(formatButton("<strong>B</strong>", "Bold", () => wrapSelection(textarea, "**", "**", "bold text")));
+      formatbar.append(formatButton('<span class="zb-italic-icon">I</span>', "Italic", () => wrapSelection(textarea, "*", "*", "italic text")));
+      formatbar.append(formatButton(linkIcon(), "Link", () => insertLink(textarea)));
       formatbar.append(formatButton("&lt;/&gt;", "Code", () => wrapSelection(textarea, "`", "`", "code")));
       formatbar.append(formatButton("&#8220;", "Quote", () => prefixSelectionLines(textarea, "> ")));
       formatbar.append(formatButton("&#8226;", "List", () => prefixSelectionLines(textarea, "- ")));
-      formatbar.append(formatButton("&#128247;", "Image", () => file.click()));
+      formatbar.append(formatButton(imageIcon(), "Image", () => file.click()));
       formatbar.append(
-        button("&#128522;", "zb-icon-button", () => {
+        button(smileIcon(), "zb-icon-button zb-format-button", () => {
           state.emojiOpen = !state.emojiOpen;
           renderEmojiPanel(wrap, textarea);
         }, "Emoji"),
       );
-      wrap.append(formatbar);
 
+      const editorShell = el("div", "zb-editor-shell");
       const editorHead = el("div", "zb-editor-head");
       const segments = el("div", "zb-segments");
       const writeButton = button("Write", "zb-segment", () => setComposerMode("write", editorShell, textarea, preview, writeButton, previewButton));
       const previewButton = button("Preview", "zb-segment", () => setComposerMode("preview", editorShell, textarea, preview, writeButton, previewButton));
+      segments.setAttribute("role", "tablist");
+      writeButton.setAttribute("role", "tab");
+      previewButton.setAttribute("role", "tab");
       segments.append(writeButton, previewButton);
       editorHead.append(segments);
-      wrap.append(editorHead);
+      editorShell.append(editorHead);
 
-      const editorShell = el("div", "zb-editor-shell");
-      editorShell.append(textarea);
+      const editorBody = el("div", "zb-editor-body");
+      editorBody.append(textarea);
       preview = el("div", "zb-preview zb-markdown");
-      editorShell.append(preview);
-      wrap.append(editorShell);
+      editorBody.append(preview);
+      editorShell.append(editorBody);
       setComposerMode(state.composerMode, editorShell, textarea, preview, writeButton, previewButton);
 
       const toolbar = el("div", "zb-toolbar");
 
       const right = el("div", "zb-actions");
       right.append(
-        button("Post", "zb-button zb-button-primary", async () => {
+        button(state.replyTo ? "Reply" : "Comment", "zb-button zb-button-primary", async () => {
           const content = state.draft.trim();
           if (!content || state.busy) {
             return;
@@ -223,7 +226,11 @@
       meta = el("div", "zb-editor-meta", `${state.draft.length}/5000`);
       toolbar.append(meta);
       toolbar.append(right);
-      wrap.append(toolbar);
+      const editorFooter = el("div", "zb-editor-footer");
+      editorFooter.append(formatbar);
+      editorFooter.append(toolbar);
+      editorShell.append(editorFooter);
+      wrap.append(editorShell);
       return wrap;
     }
 
@@ -389,6 +396,18 @@
     return button(label, "zb-icon-button zb-format-button", onClick, title);
   }
 
+  function linkIcon() {
+    return '<svg class="zb-format-svg" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.5 4.75 3.75 7.5a2.12 2.12 0 0 0 3 3L8 9.25m1.5 2 2.75-2.75a2.12 2.12 0 0 0-3-3L8 6.75"/></svg>';
+  }
+
+  function imageIcon() {
+    return '<svg class="zb-format-svg" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><rect x="2.75" y="3" width="10.5" height="10" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.5"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m4.6 11 2.3-2.4 1.7 1.6 1.4-1.5 1.4 2.3"/><circle cx="6" cy="6.1" r=".75" fill="currentColor"/></svg>';
+  }
+
+  function smileIcon() {
+    return '<svg class="zb-format-svg" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="5.25" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="6.1" cy="6.7" r=".65" fill="currentColor"/><circle cx="9.9" cy="6.7" r=".65" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.5" d="M5.7 9.4c.48.75 1.23 1.1 2.3 1.1s1.82-.35 2.3-1.1"/></svg>';
+  }
+
   function setComposerMode(mode, shell, textarea, preview, writeButton, previewButton) {
     stateSafeSetMode(shell, mode);
     if (mode === "preview") {
@@ -398,6 +417,10 @@
     preview.hidden = mode !== "preview";
     writeButton.classList.toggle("zb-segment-active", mode === "write");
     previewButton.classList.toggle("zb-segment-active", mode === "preview");
+    writeButton.setAttribute("aria-pressed", String(mode === "write"));
+    previewButton.setAttribute("aria-pressed", String(mode === "preview"));
+    writeButton.setAttribute("aria-selected", String(mode === "write"));
+    previewButton.setAttribute("aria-selected", String(mode === "preview"));
   }
 
   function stateSafeSetMode(shell, mode) {
