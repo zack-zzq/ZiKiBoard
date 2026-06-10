@@ -1,7 +1,10 @@
 (function () {
-  const EMOJIS = [0x1f44d, 0x2764, 0x1f602, 0x1f389, 0x1f440, 0x1f680].map((code) =>
-    String.fromCodePoint(code),
-  );
+  const EMOJIS = [
+    0x1f44d, 0x2764, 0x1f602, 0x1f389, 0x1f440, 0x1f680,
+    0x1f60a, 0x1f64f, 0x1f525, 0x1f4af, 0x1f44f, 0x1f4a1,
+    0x1f914, 0x1f92f, 0x2728, 0x1f929, 0x1f622, 0x1f621,
+    0x1f60e, 0x1f64c, 0x1f4a5, 0x1f4ab, 0x1f3b5, 0x1f340
+  ].map((code) => String.fromCodePoint(code));
 
   const script = document.currentScript;
   const targets = document.querySelectorAll("[data-zikiboard], #zikiboard");
@@ -77,13 +80,6 @@
           await refresh();
         });
         bar.append(logout);
-      } else {
-        const providers = el("div", "zb-provider-list");
-        configuredProviders().forEach((provider) => providers.append(providerLoginButton(provider, "compact")));
-        if (!providers.childNodes.length) {
-          providers.append(el("span", "zb-login-copy", "No login provider configured."));
-        }
-        bar.append(providers);
       }
       node.append(bar);
       return node;
@@ -526,9 +522,18 @@
     html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
     html = html.replace(/\*([^*]+)\*/g, "<em>$1</em>");
     html = html.replace(/(^|\s)@([a-zA-Z0-9_-]{3,32})/g, '$1<span class="zb-mention">@$2</span>');
+
+    html = html.replace(/^[ \t]*[-*][ \t]+(.+)$/gm, "<li>$1</li>");
+    html = html.replace(/(?:<li>.*?<\/li>(?:\r?\n)?)+/g, (match) => `<ul>${match.replace(/\r?\n/g, "")}</ul>`);
+
     return html
       .split(/\n{2,}/)
-      .map((paragraph) => `<p>${paragraph.replace(/\n/g, "<br>")}</p>`)
+      .map((paragraph) => {
+        if (paragraph.startsWith("<ul>") && paragraph.endsWith("</ul>")) {
+          return paragraph;
+        }
+        return `<p>${paragraph.replace(/\n/g, "<br>")}</p>`;
+      })
       .join("");
   }
 
