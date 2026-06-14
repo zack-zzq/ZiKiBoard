@@ -11,6 +11,11 @@
   targets.forEach((target) => mount(target, script));
 
   function mount(root, currentScript) {
+    var FETCH_TIMEOUT_MS = 15000;
+    var MAX_REFRESH_RETRIES = 3;
+    var refreshAttempt = 0;
+    var currentAbort = null;
+
     const scriptUrl = currentScript ? new URL(currentScript.src, window.location.href) : new URL(window.location.href);
     const apiBase = root.dataset.apiBase || scriptUrl.origin;
     const blogId = root.dataset.blogId || `${window.location.host}${window.location.pathname}`;
@@ -26,26 +31,74 @@
       emojiOpen: false,
       error: "",
       busy: false,
+      loading: true,
     };
 
     root.__zikiboardState = state;
     root.classList.add("zb");
+    showLoading();
     refresh();
+
+    function showLoading() {
+      root.innerHTML =
+        '<div class="zb-loading">' +
+        '<div class="zb-loading-spinner"></div>' +
+        '<div>Loading comments...</div>' +
+        '</div>';
+    }
+
+    function showError(message) {
+      root.innerHTML =
+        '<div class="zb-error">' +
+        '<div>' + escapeHtml(message || 'Failed to load comments') + '</div>' +
+        '<button class="zb-retry-btn" type="button">Retry</button>' +
+        '</div>';
+      var retryBtn = root.querySelector('.zb-retry-btn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', function () {
+          refreshAttempt = 0;
+          state.loading = true;
+          showLoading();
+          refresh();
+        });
+      }
+    }
 
     async function refresh() {
       state.error = "";
+      state.loading = true;
+
+      // Abort any in-flight requests from a previous refresh attempt
+      if (currentAbort) {
+        try { currentAbort.abort(); } catch (_) {}
+      }
+      currentAbort = new AbortController();
+      var signal = currentAbort.signal;
+
       try {
         const [config, comments] = await Promise.all([
-          api("/api/config"),
-          api(`/api/blogs/${encodeURIComponent(blogId)}/comments`),
+          api("/api/config", undefined, signal),
+          api(`/api/blogs/${encodeURIComponent(blogId)}/comments`, undefined, signal),
         ]);
         state.providers = config.providers || [];
         state.user = config.user || null;
         state.comments = comments.comments || [];
+        state.loading = false;
+        refreshAttempt = 0;
+        render();
       } catch (error) {
-        state.error = messageFrom(error);
+        if (signal.aborted) return; // Superseded by a newer refresh
+        refreshAttempt++;
+        if (refreshAttempt < MAX_REFRESH_RETRIES) {
+          // Exponential back-off: 1s, 2s, 4s
+          var delay = Math.pow(2, refreshAttempt - 1) * 1000;
+          setTimeout(function () { refresh(); }, delay);
+        } else {
+          state.loading = false;
+          state.error = messageFrom(error);
+          showError(state.error);
+        }
       }
-      render();
     }
 
     function render() {
@@ -362,11 +415,38 @@
       root.querySelectorAll(".zb-emoji-panel,.zb-mentions").forEach((node) => node.remove());
     }
 
-    async function api(path, options) {
-      const response = await fetch(`${apiBase}${path}`, {
-        credentials: "include",
-        ...options,
-      });
+    async function api(path, options, signal) {
+      // Use AbortSignal.timeout when available, otherwise fall back to
+      // a manual AbortController that fires after FETCH_TIMEOUT_MS.
+      var timeoutSignal;
+      if (typeof AbortSignal !== 'undefined' && AbortSignal.timeout) {
+        timeoutSignal = AbortSignal.timeout(FETCH_TIMEOUT_MS);
+      }
+
+      // Combine the caller's abort signal with the timeout signal
+      var combinedSignal;
+      if (signal && timeoutSignal) {
+        var combined = new AbortController();
+        signal.addEventListener('abort', function () { combined.abort(signal.reason); });
+        timeoutSignal.addEventListener('abort', function () { combined.abort(timeoutSignal.reason); });
+        combinedSignal = combined.signal;
+      } else {
+        combinedSignal = signal || timeoutSignal || undefined;
+      }
+
+      var response;
+      try {
+        response = await fetch(`${apiBase}${path}`, {
+          credentials: "include",
+          signal: combinedSignal,
+          ...options,
+        });
+      } catch (fetchError) {
+        if (fetchError && fetchError.name === 'AbortError') {
+          throw new Error('Request timed out');
+        }
+        throw new Error('Network error');
+      }
       const contentType = response.headers.get("content-type") || "";
       const data = contentType.includes("application/json") ? await response.json() : null;
       if (!response.ok) {
